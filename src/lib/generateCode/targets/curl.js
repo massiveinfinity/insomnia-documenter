@@ -22,7 +22,7 @@ export default function curl(url, req) {
 
   if (req.body && req.body.params && req.body.params.length) {
     req.body.params.forEach(param => {
-      if (param.value === null) {
+      if (param.value === null || param.value === undefined) {
         return false;
       }
 
