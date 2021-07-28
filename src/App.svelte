@@ -1,7 +1,9 @@
 <script>
+  import Select from 'svelte-select';
   import Sidebar from "./components/Sidebar.svelte";
   import Content from "./components/Content.svelte";
   import applyEnvForObject from "./lib/applyEnvForObject";
+  import CuteConfig from "./lib/cuteConfig";
 
   export let config;
 
@@ -28,6 +30,60 @@
     exampleVisible = !exampleVisible;
     localStorage.setItem('show-examples', exampleVisible);
   }
+
+  function reloadWorkspace() {
+    let envId = 0;
+    $: env = config.environments[envId];
+    $: color = env.color;
+    $: requests = applyEnvForObject(config.requests, config.environments[envId]);
+    $: groups = applyEnvForObject(config.groups, config.environments[envId]);
+  }
+
+  async function loadNewJSON(selectVal) {
+    let url = '';
+    if (selectVal === 'chocolate') {
+      url = '/insomnia.json';
+    }
+    else if (selectVal === 'pizza') {
+      url = '/insomnia2.json';
+    }
+    else if (selectVal === 'cake') {
+      url = '/insomnia1-a.json';
+    }
+
+    // const url = '/insomnia.json';
+    const json = await fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    }).then(res => res.json());
+    console.log('>> json', json);
+
+    const insomniaConfig = new CuteConfig(json).generate();
+    console.log('>> insomniaConfig', insomniaConfig);
+    config = insomniaConfig;
+
+    console.log('>> reload workspace');
+    reloadWorkspace();
+    console.log('>> end');
+  }
+
+  const selectItems = [
+    {value: 'chocolate', label: 'Hoolah'},
+    {value: 'pizza', label: 'Japan Curator'},
+    {value: 'cake', label: 'Profient Space'}
+  ];
+
+  let selectValue = selectItems[0];
+
+  function handleSelect(event) {
+    console.log('selected item', event.detail);
+    // .. do something here 🙂
+    loadNewJSON(event.detail.value);
+  }
 </script>
 
 <style type="scss" global>
@@ -45,7 +101,7 @@
     display: flex;
     justify-content: space-between;
     height: 60px;
-    overflow: hidden;
+    //overflow: hidden;
   }
 
   header .header-left,
@@ -120,6 +176,8 @@
     </div>
 
     <h1 class="title">{config.workspace.name}</h1>
+
+    <Select items={selectItems} value={selectValue} on:select={handleSelect}></Select>
   </div>
   <div class="header-right">
     <div class="run">

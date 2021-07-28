@@ -56,7 +56,7 @@
     "sirv-cli": "^0.4.4",
     "svelte": "^3.0.0",
     "svelte-preprocess": "^3.1.1",
-    "svelte-select": "^3.0.2"
+    "svelte-select": "^3.17.0"
   },
   "dependencies": {
     "commander": "^3.0.1",
